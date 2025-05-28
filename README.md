@@ -1,32 +1,126 @@
-# TPPA-Compatible Protocol for Motorized Polar Alignment System
+# Serial Alt-Az Polar Alignment Controller
 
-## 📡 Overview
+This project defines a **simple serial communication protocol** for controlling a two-axis (ALT/AZM) motorized system for polar alignment corrections. It is inspired by Avalon’s Polar Alignment System and designed to be compatible with tools like the TPPA plugin in NINA.
 
-This repository documents a minimal, serial-based protocol for controlling a motorized Alt-Az platform for polar alignment, compatible with the TPPA plugin in N.I.N.A.
+## 👨‍🔧 Project Context
 
-## 📘 Description
+I'm an amateur maker, not a professional developer. This initiative emerged from a passion project involving **motorized adjustment of polar alignment** on an equatorial mount. I'm using an **OnStepX-based controller**, but I want this protocol to remain **platform-agnostic and open** so that anyone can adapt it to their own setup.
 
-The protocol allows simple serial communication to:
+This effort is being developed in collaboration with the TPPA plugin author, who is considering integrating this kind of control directly into NINA — provided we can settle on a clear, standard protocol.
 
-- Apply correction movements in Altitude and Azimuth.
-- Report current correction status.
-- Be fully open and adaptable for DIY platforms.
+## 🧠 Protocol Overview
 
-## 📐 Commands
+The communication occurs over a **serial port** at 115200 baud (8N1). Each command sent to the controller must be terminated with `\n`.
 
-| Command         | Description                                      |
-|----------------|--------------------------------------------------|
-| `MOVE:AZM=+0.12` | Move AZM by +0.12° (East = +, West = -)         |
-| `MOVE:ALT=-0.07` | Move ALT by -0.07° (Up = +, Down = -)           |
-| `POS?`          | Query current corrected position                 |
-| `STOP`          | Stop all motion immediately                      |
-| `RESET`         | Reset internal position to zero                  |
+Commands are **text-based** and return a string ending with `#`.
 
-## ✍️ Author
+---
 
-Antonino — passionate maker, not a professional developer 😉  
-With assistance from ChatGPT.
+## 📡 Supported Commands
 
-## 📅 Status
+### 1. `MOVE AZM:<delta> ALT:<delta>`
+Moves the mount in azimuth and altitude by the specified deltas (in degrees).
 
-Draft — open to feedback and collaboration!
+**Example:**
+```txt
+MOVE AZM:+0.25 ALT:-0.12
+→ OK#
+```
+
+---
+
+### 2. `GETPOS`
+Returns the current ALT/AZM position of the alignment system.
+
+**Example:**
+```txt
+GETPOS
+→ AZM:+0.25 ALT:-0.12#
+```
+
+---
+
+### 3. `STOP`
+Immediately halts any ongoing movement.
+
+**Example:**
+```txt
+STOP
+→ OK#
+```
+
+---
+
+### 4. `PING`
+Basic ping to test communication.
+
+**Example:**
+```txt
+PING
+→ PONG#
+```
+
+---
+
+### 5. `HELP`
+Returns the list of available commands.
+
+**Example:**
+```txt
+HELP
+→ MOVE, GETPOS, STOP, PING, HELP#
+```
+
+---
+
+## ✍️ Serial Output Format
+
+All responses must end with a `#` character.
+
+- OK → `OK#`
+- Errors (optional extension): `ERR:message#`
+- Position: `AZM:<float> ALT:<float>#`
+
+---
+
+## 🔁 Example Communication
+
+```txt
+→ MOVE AZM:+0.15 ALT:-0.07
+← OK#
+
+→ GETPOS
+← AZM:+0.15 ALT:-0.07#
+```
+
+---
+
+## 🛠️ Implementation Notes
+
+The physical system includes:
+- Two stepper motors (ALT and AZM)
+- Motor drivers
+- A controller capable of reading serial commands and applying microstep-accurate movements
+
+Precision target: adjustments < 30 arcseconds (~0.0083°)
+
+---
+
+## 🌐 Future Considerations
+
+- Dynamic port detection
+- Query for mechanical limits
+- Support for homing / reset commands
+- Configurable step-per-degree values
+
+---
+
+## 🤝 Contributions Welcome
+
+This repository is **open source and community-driven**. Feedback, improvements, and implementations in various ecosystems are more than welcome.
+
+---
+
+## ✉️ Contact
+
+For questions or suggestions, feel free to reach me via GitHub issues or email: 
