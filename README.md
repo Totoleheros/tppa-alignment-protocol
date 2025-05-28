@@ -123,4 +123,4 @@ This repository is **open source and community-driven**. Feedback, improvements,
 
 ## ✉️ Contact
 
-For questions or suggestions, feel free to reach me via GitHub issues or email: 
+For questions or suggestions, feel free to reach me via GitHub issues or email: antonino.antispam@free.fr
