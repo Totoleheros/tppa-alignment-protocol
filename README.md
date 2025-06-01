@@ -14,6 +14,12 @@ This project defines a **simple serial communication protocol** for controlling 
 
 ---
 
+## 📽️ Demo
+
+I will soon post here a link to a video showing the first prototype in action.
+
+---
+
 ## 🛠 Hardware Requirements
 
 | Component       | Notes                                   |
@@ -115,10 +121,13 @@ const float LIMIT_MAX_ALT =  15.0;
 
 ---
 
-## 🤝 Compatibility
+## 🤝 Communication
 
-- ✅ NINA Plugin: TPPA (Three-Point Polar Alignment)
-- ✅ Compatible with direct serial control via USB or TCP bridge
+- ☑️ NINA Plugin: TPPA (Three-Point Polar Alignment): to come...
+- ✅Communication is handled via direct USB serial connection.
+- ✅Connect the FYSETC E4 to your PC using a standard USB Type-B cable.
+- ✅Baudrate: **9600** (host side) / **115200** (UART TMC drivers).
+- ✅No network bridge or TCP interface is required.
 
 ---
 
