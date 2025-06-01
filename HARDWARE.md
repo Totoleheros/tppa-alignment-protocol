@@ -41,9 +41,12 @@
 - Example: [AliExpress – ~30€](https://fr.aliexpress.com/item/1005001704413148.html)
 - ![FYSETC E4 Board](IMAGES/fysetc-e4.jpg)
 
+### 6. Orientation Ring (iglidur® PRT-02)
+- **Reference**: [igus PRT-02 LC J4](https://www.igus.fr/product/iglidur_PRT_02_LC_J4) (~€63)  
+  ![Orientation Ring](IMAGES/orientation_ring.jpg)
 ---
 
-### 💰 Estimated Total: ~**252€**
+### 💰 Estimated Total: ~**315€**
 
 ## 🖨️ 3D Printing Notes
 
@@ -58,7 +61,7 @@
 
 - ~252€ hardware base
 - + CNC machining (optional): ~90€
-- 🟰 **~400€ total project budget**
+- 🟰 **~400-450€ total project budget**
 
 ---
 
