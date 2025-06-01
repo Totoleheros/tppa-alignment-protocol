@@ -78,7 +78,7 @@
 
 ## 📸 Assembly Photos
 
-You can find detailed images in the `/IMAGES` folder of this repository.
+You can find detailed images in the `/IMAGES/ASSEMBLY` folder of this repository.
 
 ---
 
