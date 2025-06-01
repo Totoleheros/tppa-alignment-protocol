@@ -121,13 +121,26 @@ const float LIMIT_MAX_ALT =  15.0;
 
 ---
 
+## 🔍 Theoretical Precision
+
+Based on the mechanical and electrical configuration of this system, the expected **angular resolution** (theoretical minimum step) is:
+
+| Axis | Total Gear Reduction | Microsteps per Revolution | Angular Resolution | In Arcseconds |
+|------|-----------------------|----------------------------|--------------------|----------------|
+| AZM  | 100:1 (Harmonic Drive) | 3200                       | 0.000003125°       | **~0.011 arcsec** |
+| ALT  | 90:1 (Planetary + Belt) | 3200                      | 0.00000347°        | **~0.0125 arcsec** |
+
+> ⚠️ *These values are theoretical and do not account for mechanical play, elasticity, backlash, driver interpolation error, or step skipping. Real-world performance may vary depending on build quality, driver tuning, and environmental factors.*
+
+---
+
 ## 🤝 Communication
 
 - ☑️ NINA Plugin: TPPA (Three-Point Polar Alignment): to come...
-- ✅Communication is handled via direct USB serial connection.
-- ✅Connect the FYSETC E4 to your PC using a standard USB Type-B cable.
-- ✅Baudrate: **9600** (host side) / **115200** (UART TMC drivers).
-- ✅No network bridge or TCP interface is required.
+- ✅ Communication is handled via direct USB serial connection.
+- ✅ Connect the FYSETC E4 to your PC using a standard USB Type-B cable.
+- ✅ Baudrate: **9600** (host side) / **115200** (UART TMC drivers).
+- ✅ No network bridge or TCP interface is required.
 
 ---
 
@@ -139,7 +152,9 @@ MIT — do whatever you want, improve and share back!
 
 ## 🛰️ Acknowledgments
 
-Built by [Antonino Nicoletti] with guidance from [Stefan Berg](https://discord.gg/nina) (TPPA/NINA) and based on FYSETC 
+Built by [Antonino Nicoletti] with guidance from [Stefan Berg](https://discord.gg/nina) (TPPA/NINA) and based on FYSETC.
+
+---
 
 ## 🤝 Contributions Welcome
 
