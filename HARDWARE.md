@@ -59,7 +59,7 @@
 
 ### 🧮 Final Cost Estimate
 
-- ~252€ hardware base
+- ~320€ hardware base
 - + CNC machining (optional): ~90€
 - 🟰 **~400-450€ total project budget**
 
