@@ -88,13 +88,13 @@ A video demonstration of the first working prototype will be added here shortly.
 | `ALT:-1.20`     | Move altitude motor -1.20°                       |
 | `RST`           | Reset internal positions of both axes           |
 | `POS?` / `STA?` | Query current position of both axes             |
+| `?`             | Alias for position query, G-code style          |
 
-> 🧾 When sending `?`, the reply format is:
+> 🧾 When sending `POS?`, `STA?`, or `?`, the reply format is:
 >
 > `<Idle|MPos:+1.234,-0.567,0|`
-> *(followed by an empty line, as required by TPPA)*
 >
-> This is used by TPPA to check motion state and motor positions.
+> *(followed by an empty line, as required by TPPA)*
 
 ---
 
