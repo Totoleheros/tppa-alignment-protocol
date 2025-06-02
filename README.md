@@ -18,7 +18,7 @@ This project defines a **simple serial communication protocol** for controlling 
 
 ## 📽️ Demo
 
-A video demonstration of the first working prototype will be added here shortly.
+A video demonstration of the first working prototype can be seen here: https://d.pr/v/Lk6GNp.
 
 ---
 
