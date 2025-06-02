@@ -42,11 +42,7 @@
  *   - POS? / STA? → Query current AZM and ALT offsets (legacy)
  *   - ?            → G-code style TPPA query: <Idle|MPos:+1.234,-0.567,0|
  *   - RST          → Reset both positions to zero
- *
- * 🔀 DEVICE RESPONSES:
- *   - OK           → Command executed successfully
- *   - BUSY         → Motor is currently executing a move
- *   - ERR:<msg>    → Invalid or out-of-bounds command
+ *   - HOME         → Return both AZM and ALT motors to logical 0.0°
  */
 
 #include <TMCStepper.h>
@@ -89,6 +85,22 @@ TMC2209Stepper driverALT(&ALTSerial, R_SENSE, DRIVER_ADDRESS);
 float currentPosAZM = 0.0;
 float currentPosALT = 0.0;
 
+// ------------------------ MOVE FUNCTION ------------------------
+void moveMotor(int stepPin, int dirPin, float degrees, float stepsPerDegree, float &pos) {
+  long steps = round(degrees * stepsPerDegree);
+  if (steps == 0) return;
+
+  digitalWrite(dirPin, steps > 0 ? HIGH : LOW);
+  steps = abs(steps);
+  for (long i = 0; i < steps; i++) {
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(600);
+    digitalWrite(stepPin, LOW);
+    delayMicroseconds(600);
+  }
+  pos += degrees;
+}
+
 // ----------------------------- SETUP -----------------------------
 void setup() {
   Serial.begin(9600);
@@ -121,22 +133,6 @@ void setup() {
   driverALT.en_spreadCycle(false);
 
   Serial.println("READY");
-}
-
-// ------------------------ MOVE FUNCTION ------------------------
-void moveMotor(int stepPin, int dirPin, float degrees, float stepsPerDegree, float &pos) {
-  long steps = round(degrees * stepsPerDegree);
-  if (steps == 0) return;
-
-  digitalWrite(dirPin, steps > 0 ? HIGH : LOW);
-  steps = abs(steps);
-  for (long i = 0; i < steps; i++) {
-    digitalWrite(stepPin, HIGH);
-    delayMicroseconds(600);
-    digitalWrite(stepPin, LOW);
-    delayMicroseconds(600);
-  }
-  pos += degrees;
 }
 
 // ----------------------------- LOOP -----------------------------
@@ -175,6 +171,13 @@ void loop() {
       Serial.println("OK");
     }
 
+    else if (input == "HOME") {
+      Serial.println("BUSY");
+      moveMotor(STEP_PIN_AZM, DIR_PIN_AZM, -currentPosAZM, STEPS_PER_DEGREE_AZM, currentPosAZM);
+      moveMotor(STEP_PIN_ALT, DIR_PIN_ALT, -currentPosALT, STEPS_PER_DEGREE_ALT, currentPosALT);
+      Serial.println("OK");
+    }
+
     else if (input == "POS?" || input == "STA?") {
       Serial.print("POS:AZM=");
       Serial.print(currentPosAZM, 3);
@@ -189,6 +192,63 @@ void loop() {
       Serial.print(currentPosALT, 3);
       Serial.println(",0|");
       Serial.println(); // TPPA expects empty line
+    }
+
+    else if (input.startsWith("J=")) {
+      input = input.substring(2); // remove "J="
+
+      bool isRelative = false;
+      char axis = 0;
+      float value = 0.0;
+      int fIndex = input.indexOf('F');
+
+      if (input.startsWith("G91")) {
+        isRelative = true;
+        input = input.substring(3); // remove G91
+      } else if (input.startsWith("G53")) {
+        isRelative = false;
+        input = input.substring(3); // remove G53
+      } else {
+        Serial.println("ERR:Malformed G-code");
+        return;
+      }
+
+      input.trim();
+      if (input.length() < 3 || fIndex == -1) {
+        Serial.println("ERR:Malformed G-code");
+        return;
+      }
+
+      axis = input.charAt(0);
+      String valStr = input.substring(1, fIndex);
+      value = valStr.toFloat();
+
+      if (axis != 'X' && axis != 'Y') {
+        Serial.println("ERR:Unknown axis");
+        return;
+      }
+
+      if (axis == 'X') {
+        float target = isRelative ? currentPosAZM + value : value;
+        if (target >= LIMIT_MIN_AZM && target <= LIMIT_MAX_AZM) {
+          if (value != 0.0) Serial.println("BUSY");
+          moveMotor(STEP_PIN_AZM, DIR_PIN_AZM, target - currentPosAZM, STEPS_PER_DEGREE_AZM, currentPosAZM);
+          Serial.println("OK");
+        } else {
+          Serial.println("ERR:AZM out of bounds");
+        }
+      }
+
+      else if (axis == 'Y') {
+        float target = isRelative ? currentPosALT + value : value;
+        if (target >= LIMIT_MIN_ALT && target <= LIMIT_MAX_ALT) {
+          if (value != 0.0) Serial.println("BUSY");
+          moveMotor(STEP_PIN_ALT, DIR_PIN_ALT, target - currentPosALT, STEPS_PER_DEGREE_ALT, currentPosALT);
+          Serial.println("OK");
+        } else {
+          Serial.println("ERR:ALT out of bounds");
+        }
+      }
     }
 
     else {
