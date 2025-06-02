@@ -109,6 +109,9 @@ A video demonstration of the first working prototype will be added here shortly.
 > ✅ `X` targets AZM, `Y` targets ALT  
 > ✅ `Fxxx` is the speed, required as an integer
 
+> 📝 **Note**: G53 and G91 are part of standard G-code logic.  
+> G53 enforces movement in *absolute coordinates*, while G91 enables *relative positioning*. These conventions ensure compatibility with CAM tools, CNC interpreters, and plugin expectations like TPPA.
+
 ---
 
 ### 🗨️ Firmware Replies
