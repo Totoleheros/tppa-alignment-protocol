@@ -10,6 +10,7 @@ This project defines a **simple serial communication protocol** for controlling 
 - Simple **serial command interface** (historical: `AZM:+1.2`, `ALT:-0.5`, etc.)
 - **Position tracking** and software **movement limits**
 - `RST` to reset position, `POS?` or `STA?` to query state
+- `HOME` to return to origin (0,0) position
 - Optional **G-code inspired commands** (`J=G91X+1.0F300`)
 - Fully customizable motor specs and gear ratios
 
@@ -87,6 +88,7 @@ A video demonstration of the first working prototype will be added here shortly.
 | `ALT:+0.80`     | Move altitude motor +0.80°                       |
 | `ALT:-1.20`     | Move altitude motor -1.20°                       |
 | `RST`           | Reset internal positions of both axes           |
+| `HOME`          | Return both motors to position 0,0              |
 | `POS?` / `STA?` | Query current position of both axes             |
 | `?`             | Alias for position query, G-code style          |
 
@@ -98,7 +100,7 @@ A video demonstration of the first working prototype will be added here shortly.
 
 ---
 
-### 🧪 Experimental (G-code inspired) - Should work with TPPA: test in progress...
+### 🧪 Experimental (G-code inspired) - Should work with TPPA
 
 | Command Example              | Description                                      |
 |-----------------------------|--------------------------------------------------|
@@ -111,21 +113,6 @@ A video demonstration of the first working prototype will be added here shortly.
 > ✅ `X` targets AZM, `Y` targets ALT  
 > ✅ `Fxxx` is the speed, required as an integer
 
-> 📝 **Note**: G53 and G91 are part of standard G-code logic.  
-> G53 enforces movement in *absolute coordinates*, while G91 enables *relative positioning*. These conventions ensure compatibility with CAM tools, CNC interpreters, and plugin expectations like TPPA.
-
----
-
-### 🗨️ Firmware Replies
-
-| Response                  | Meaning                                          |
-|---------------------------|--------------------------------------------------|
-| `OK`                      | Command accepted and completed                  |
-| `BUSY`                    | Motor is currently moving                       |
-| `ERR:AZM out of bounds`   | Exceeded ±10° azimuth limit                     |
-| `ERR:ALT out of bounds`   | Exceeded ±15° altitude limit                    |
-| `ERR:Unknown command`     | Invalid or unrecognized command                 |
-
 ---
 
 ## 🧠 Customization
@@ -133,13 +120,11 @@ A video demonstration of the first working prototype will be added here shortly.
 Edit `PolarAlignV2.ino` to reflect your setup:
 
 ```cpp
-const float MOTOR_STEPS_PER_REV = 200.0;  // typical for 1.8° motors
+const float MOTOR_STEPS_PER_REV = 200.0;
 const float MICROSTEPPING = 16.0;
-const float GEAR_RATIO_AZM = 100.0;       // Harmonic
-const float GEAR_RATIO_ALT = 90.0;        // Planetary + Belt
+const float GEAR_RATIO_AZM = 100.0;
+const float GEAR_RATIO_ALT = 90.0;
 ```
-
-### Software movement limits:
 
 ```cpp
 const float LIMIT_MIN_AZM = -10.0;
@@ -147,36 +132,6 @@ const float LIMIT_MAX_AZM =  10.0;
 const float LIMIT_MIN_ALT = -15.0;
 const float LIMIT_MAX_ALT =  15.0;
 ```
-
----
-
-## 🔍 Theoretical Precision
-
-| Axis | Gear Ratio | Microsteps/rev | Step Size (°)  | Arcsec     |
-|------|-------------|----------------|----------------|------------|
-| AZM  | 100:1       | 3200           | 0.000003125°   | ~0.011"    |
-| ALT  | 90:1        | 3200           | 0.00000347°    | ~0.0125"   |
-
-> ⚠️ *These are ideal values. Real-world accuracy depends on mechanical backlash, elasticity, friction, and tuning.*
-
----
-
-## 🧰 Hardware Assembly & Docs
-
-- 📄 A detailed mechanical and electrical breakdown can be found in [`HARDWARE.md`](./HARDWARE.md)
-- 🖼️ Assembly pictures and diagrams are available in [`IMAGES/ASSEMBLY/`](./IMAGES/ASSEMBLY/)
-- This includes photos of the 3D-printed mounts, wiring, and motor orientation.
-
-> Feel free to contribute your own setups and share them via GitHub issues or PRs!
-
----
-
-## 🤝 Integration & Communication
-
-- 🔌 USB Serial connection (no network required)
-- Baudrate: **9600**
-- TPPA plugin: auto-detects device, expects `POS?` replies in correct format
-- Cable: USB Type-B (from E4 to PC)
 
 ---
 
@@ -188,17 +143,6 @@ MIT — use, modify, and share freely.
 
 ## 🛰️ Acknowledgments
 
-Thanks to [Stefan Berg](https://discord.gg/nina) (NINA/TPPA), the OnStep community, and all testers.  
+Thanks to [Stefan Berg](https://discord.gg/nina), the OnStep community, and all testers.  
 Project built by **Antonino Nicoletti**.
 
----
-
-## 🤝 Contributions Welcome
-
-This is an open, collaborative project. PRs and suggestions are welcome!
-
----
-
-## ✉️ Contact
-
-GitHub issues or antonino.antispam@free.fr
