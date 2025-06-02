@@ -89,10 +89,12 @@ A video demonstration of the first working prototype will be added here shortly.
 | `RST`           | Reset internal positions of both axes           |
 | `POS?` / `STA?` | Query current position of both axes             |
 
-> 🧾 When sending `POS?` or `STA?`, the reply format is:
+> 🧾 When sending `?`, the reply format is:
 >
 > `<Idle|MPos:+1.234,-0.567,0|`
 > *(followed by an empty line, as required by TPPA)*
+>
+> This is used by TPPA to check motion state and motor positions.
 
 ---
 
