@@ -7,40 +7,40 @@ This project defines a **simple serial communication protocol** for controlling 
 ## 📦 Features
 
 - UART control of **two TMC2209 stepper drivers** (Azimuth & Altitude)
-- Simple **serial command interface** (`AZM:+1.2`, `ALT:-0.5`, etc.)
+- Simple **serial command interface** (historical: `AZM:+1.2`, `ALT:-0.5`, etc.)
 - **Position tracking** and software **movement limits**
-- `RST` to reset position, `POS?` to query state
+- `RST` to reset position, `POS?` or `STA?` to query state
+- Optional **G-code inspired commands** (`J=G91X+1.0F300`)
 - Fully customizable motor specs and gear ratios
 
 ---
 
 ## 📽️ Demo
 
-I will soon post here a link to a video showing the first prototype in action.
+A video demonstration of the first working prototype will be added here shortly.
 
 ---
 
 ## 🛠 Hardware Requirements
 
-| Component       | Notes                                   |
-|----------------|------------------------------------------|
-| FYSETC E4 V1.0  | ESP32-based controller with 4x TMC2209  |
-| 2x stepper motors | 1.8° recommended (e.g. 17HS19-2004S1) |
-| Power supply    | 12V (recommended for silent operation)  |
-| UART wiring     | Z-MIN → PDN (MOTX), Y-MIN → PDN (MOTY)  |
-| Optional        | 1–10 µF capacitor between RST and GND (for reliable flashing) |
+| Component         | Notes                                                 |
+|------------------|--------------------------------------------------------|
+| FYSETC E4 V1.0    | ESP32-based controller with 4x TMC2209                |
+| 2x stepper motors | 1.8° recommended (e.g. 17HS19-2004S1)                 |
+| Power supply      | 12V (recommended for silent operation)               |
+| UART wiring       | Z-MIN → PDN (MOTX), Y-MIN → PDN (MOTY)               |
+| Optional          | 1–10 µF capacitor between RST and GND (ESP32 stability) |
 
 ---
 
 ## ⚙️ Arduino IDE Setup
 
 1. **Install ESP32 support**:
-   - Open Arduino IDE
-   - File → Preferences → Additional Boards Manager URLs:
+   - Arduino IDE → Preferences → Additional Boards Manager URLs:
      ```
      https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
      ```
-   - Tools → Board → Board Manager → Install "esp32" (version 2.0.17 recommended)
+   - Then install "esp32" via the Boards Manager (v2.0.17 recommended)
 
 2. **Install Library**:
    - Sketch → Include Library → Manage Libraries
@@ -58,17 +58,17 @@ I will soon post here a link to a video showing the first prototype in action.
 | Partition Scheme      | Huge APP (3MB No OTA / 1MB SPIFFS)         |
 | PSRAM                 | Enabled                                    |
 | Upload Speed          | 115200                                     |
-| Port                  | `/dev/cu.wchusbserial10` (may vary)        |
+| Port                  | `/dev/cu.wchusbserialXXXX`                 |
 
 ---
 
 ## 🔌 Motor Wiring (default)
 
-| Function | Motor | Pin (ESP32) | Label on E4 |
+| Function | Motor | ESP32 GPIO | Label on E4 |
 |----------|-------|-------------|-------------|
 | STEP     | AZM   | GPIO27      | MOTX        |
 | DIR      | AZM   | GPIO26      | MOTX        |
-| EN       | Both  | GPIO25      | shared      |
+| EN       | Both  | GPIO25      | Shared      |
 | UART RX  | AZM   | GPIO39      | Z-MIN       |
 | STEP     | ALT   | GPIO33      | MOTY        |
 | DIR      | ALT   | GPIO32      | MOTY        |
@@ -78,39 +78,63 @@ I will soon post here a link to a video showing the first prototype in action.
 
 ## 🧪 Serial Commands
 
+### ✅ Historical (default) format
+
 | Command         | Description                                      |
 |----------------|--------------------------------------------------|
 | `AZM:+1.25`     | Move azimuth motor +1.25°                        |
 | `AZM:-0.50`     | Move azimuth motor -0.50°                        |
 | `ALT:+0.80`     | Move altitude motor +0.80°                       |
 | `ALT:-1.20`     | Move altitude motor -1.20°                       |
-| `RST`           | Reset both positions to zero                     |
-| `POS?` / `STA?` | Return current position of both axes             |
+| `RST`           | Reset internal positions of both axes           |
+| `POS?` / `STA?` | Query current position of both axes             |
 
-### ✅ Firmware Replies
+> 🧾 When sending `POS?` or `STA?`, the reply format is:
+>
+> `<Idle|MPos:+1.234,-0.567,0|`
+> *(followed by an empty line, as required by TPPA)*
 
-| Response         | Meaning                                          |
-|------------------|--------------------------------------------------|
-| `OK`             | Command completed                               |
-| `BUSY`           | Motor is moving                                 |
-| `ERR:AZM out of bounds` | Exceeded ±10° azimuth limit         |
-| `ERR:ALT out of bounds` | Exceeded ±15° altitude limit         |
-| `ERR:Unknown command`   | Invalid or unrecognized command       |
+---
+
+### 🧪 Experimental (G-code inspired)
+
+| Command Example              | Description                                      |
+|-----------------------------|--------------------------------------------------|
+| `J=G53X+1.25F400`            | Move AZM +1.25° at speed 400 (absolute)         |
+| `J=G91X-0.50F300`            | Move AZM -0.50° at speed 300 (relative)         |
+| `J=G91Y+0.20F200`            | Move ALT +0.20° at speed 200 (relative)         |
+| `J=G53Y-0.80F400`            | Move ALT -0.80° at speed 400 (absolute)         |
+
+> ✅ `G53` = absolute mode, `G91` = relative mode  
+> ✅ `X` targets AZM, `Y` targets ALT  
+> ✅ `Fxxx` is the speed, required as an integer
+
+---
+
+### 🗨️ Firmware Replies
+
+| Response                  | Meaning                                          |
+|---------------------------|--------------------------------------------------|
+| `OK`                      | Command accepted and completed                  |
+| `BUSY`                    | Motor is currently moving                       |
+| `ERR:AZM out of bounds`   | Exceeded ±10° azimuth limit                     |
+| `ERR:ALT out of bounds`   | Exceeded ±15° altitude limit                    |
+| `ERR:Unknown command`     | Invalid or unrecognized command                 |
 
 ---
 
 ## 🧠 Customization
 
-Inside `PolarAlign.ino`, you can modify:
+Edit `PolarAlign.ino` to reflect your setup:
 
 ```cpp
-const float MOTOR_STEPS_PER_REV = 200.0;  // usually 200 for 1.8°
+const float MOTOR_STEPS_PER_REV = 200.0;  // typical for 1.8° motors
 const float MICROSTEPPING = 16.0;
-const float GEAR_RATIO_AZM = 100.0;
-const float GEAR_RATIO_ALT = 90.0;
+const float GEAR_RATIO_AZM = 100.0;       // Harmonic
+const float GEAR_RATIO_ALT = 90.0;        // Planetary + Belt
 ```
 
-Software limits:
+### Software movement limits:
 
 ```cpp
 const float LIMIT_MIN_AZM = -10.0;
@@ -123,45 +147,43 @@ const float LIMIT_MAX_ALT =  15.0;
 
 ## 🔍 Theoretical Precision
 
-Based on the mechanical and electrical configuration of this system, the expected **angular resolution** (theoretical minimum step) is:
+| Axis | Gear Ratio | Microsteps/rev | Step Size (°)  | Arcsec     |
+|------|-------------|----------------|----------------|------------|
+| AZM  | 100:1       | 3200           | 0.000003125°   | ~0.011"    |
+| ALT  | 90:1        | 3200           | 0.00000347°    | ~0.0125"   |
 
-| Axis | Total Gear Reduction | Microsteps per Revolution | Angular Resolution | In Arcseconds |
-|------|-----------------------|----------------------------|--------------------|----------------|
-| AZM  | 100:1 (Harmonic Drive) | 3200                       | 0.000003125°       | **~0.011 arcsec** |
-| ALT  | 90:1 (Planetary + Belt) | 3200                      | 0.00000347°        | **~0.0125 arcsec** |
-
-> ⚠️ *These values are theoretical and do not account for mechanical play, elasticity, backlash, driver interpolation error, or step skipping. Real-world performance may vary depending on build quality, driver tuning, and environmental factors.*
+> ⚠️ *These are ideal values. Real-world accuracy depends on mechanical backlash, elasticity, friction, and tuning.*
 
 ---
 
-## 🤝 Communication
+## 🤝 Integration & Communication
 
-- ☑️ NINA Plugin: TPPA (Three-Point Polar Alignment): to come...
-- ✅ Communication is handled via direct USB serial connection.
-- ✅ Connect the FYSETC E4 to your PC using a standard USB Type-B cable.
-- ✅ Baudrate: **9600** (host side) / **115200** (UART TMC drivers).
-- ✅ No network bridge or TCP interface is required.
+- 🔌 USB Serial connection (no network required)
+- Baudrate: **9600**
+- TPPA plugin: auto-detects device, expects `POS?` replies in correct format
+- Cable: USB Type-B (from E4 to PC)
 
 ---
 
 ## 🧾 License
 
-MIT — do whatever you want, improve and share back!
+MIT — use, modify, and share freely.
 
 ---
 
 ## 🛰️ Acknowledgments
 
-Built by [Antonino Nicoletti] with guidance from [Stefan Berg](https://discord.gg/nina) (TPPA/NINA) and based on FYSETC.
+Thanks to [Stefan Berg](https://discord.gg/nina) (NINA/TPPA), the OnStep community, and all testers.  
+Project built by **Antonino Nicoletti**.
 
 ---
 
 ## 🤝 Contributions Welcome
 
-This repository is **open source and community-driven**. Feedback, improvements, and implementations in various ecosystems are more than welcome.
+This is an open, collaborative project. PRs and suggestions are welcome!
 
 ---
 
 ## ✉️ Contact
 
-For questions or suggestions, feel free to reach me via GitHub issues or email: antonino.antispam@free.fr
+GitHub issues or antonino.antispam@free.fr
