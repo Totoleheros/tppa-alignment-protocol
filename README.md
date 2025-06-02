@@ -156,6 +156,16 @@ const float LIMIT_MAX_ALT =  15.0;
 
 ---
 
+## 🧰 Hardware Assembly & Docs
+
+- 📄 A detailed mechanical and electrical breakdown can be found in [`HARDWARE.md`](./HARDWARE.md)
+- 🖼️ Assembly pictures and diagrams are available in [`IMAGES/ASSEMBLY/`](./IMAGES/ASSEMBLY/)
+- This includes photos of the 3D-printed mounts, wiring, and motor orientation.
+
+> Feel free to contribute your own setups and share them via GitHub issues or PRs!
+
+---
+
 ## 🤝 Integration & Communication
 
 - 🔌 USB Serial connection (no network required)
