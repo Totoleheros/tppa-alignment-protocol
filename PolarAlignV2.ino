@@ -119,8 +119,12 @@ void moveMotor(int stepPin, int dirPin, float degrees, float stepsPerDegree, flo
 
 // ----------------------------- SETUP -----------------------------
 void setup() {
-  Serial.begin(9600);
-  delay(500);
+  Serial.begin(115200);            // ✅ S'assurer que la vitesse correspond à celle attendue par TPPA
+  Serial.setTimeout(10);
+  delay(100);                      // Laisse le temps à l'USB de s'initialiser
+
+  // 🔧 Vide le buffer série des messages de boot ESP32
+  while (Serial.available()) Serial.read();
 
   pinMode(EN_PIN_AZM, OUTPUT);
   pinMode(DIR_PIN_AZM, OUTPUT);
@@ -148,14 +152,33 @@ void setup() {
   driverALT.microsteps(MICROSTEPPING);
   driverALT.en_spreadCycle(false);
 
-  Serial.println("READY");
+  // ❌ Ne pas envoyer de message comme "READY" ici
 }
 
 // ----------------------------- LOOP -----------------------------
 void loop() {
   if (Serial.available()) {
+    // Gérer la commande '?' (TPPA status) immédiatement
+    if (Serial.peek() == '?') {
+      Serial.read();  // Consomme '?'
+      Serial.print("<Idle|MPos:");
+      Serial.print(currentPosAZM, 3);
+      Serial.print(",");
+      Serial.print(currentPosALT, 3);
+      Serial.println(",0|");
+      Serial.println();  // Ligne vide attendue
+
+      // 🔁 Vider le buffer jusqu'à \n inclus
+      while (Serial.available()) {
+        char c = Serial.read();
+        if (c == '\n') break;
+      }
+      return;
+    }
+
     String input = Serial.readStringUntil('\n');
     input.trim();
+    if (input.length() == 0) return;  // 🔥 Ignore les lignes vides
 
     if (input.startsWith("AZM:")) {
       float deg = input.substring(4).toFloat();
@@ -201,15 +224,6 @@ void loop() {
       Serial.println(currentPosALT, 3);
     }
 
-    else if (input == "?") {
-      Serial.print("<Idle|MPos:");
-      Serial.print(currentPosAZM, 3);
-      Serial.print(",");
-      Serial.print(currentPosALT, 3);
-      Serial.println(",0|");
-      Serial.println();
-    }
-
     else if (input.startsWith("J=")) {
       input = input.substring(2);
       input.replace("G21", "");
@@ -235,6 +249,9 @@ void loop() {
         Serial.println("ERR:Malformed G-code");
         return;
       }
+      
+      Serial.print("INPUT: ");
+      Serial.println(input);
 
       axis = input.charAt(0);
       String valStr = input.substring(1, fIndex);
