@@ -249,9 +249,6 @@ void loop() {
         Serial.println("ERR:Malformed G-code");
         return;
       }
-      
-      Serial.print("INPUT: ");
-      Serial.println(input);
 
       axis = input.charAt(0);
       String valStr = input.substring(1, fIndex);
