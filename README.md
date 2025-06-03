@@ -1,3 +1,4 @@
+
 # Serial Alt-Az Polar Alignment Controller
 
 This project defines a **simple serial communication protocol** for controlling a two-axis (ALT/AZM) motorized system for polar alignment corrections. It is inspired by Avalon’s Polar Alignment System and designed to be compatible with tools like the TPPA plugin in NINA. It is also inspired by the OnStep project since we use here the Fysetc E4 V1.0 motherboard to connect the two stepper motors. A specific Arduino code must be injected in the E4 card. 
@@ -19,6 +20,14 @@ This project defines a **simple serial communication protocol** for controlling 
 ## 📽️ Demo
 
 A video demonstration of the first working prototype can be seen here: https://d.pr/v/Lk6GNp.
+
+---
+
+## 🔩 Hardware Setup
+
+Refer to [HARDWARE.md](./HARDWARE.md) for the complete hardware assembly guide and wiring instructions.
+
+You can also view photos of the physical setup in [`IMAGES/ASSEMBLY`](./IMAGES/ASSEMBLY).
 
 ---
 
@@ -145,4 +154,3 @@ MIT — use, modify, and share freely.
 
 Thanks to [Stefan Berg](https://discord.gg/nina), the OnStep community, and all testers.  
 Project built by **Antonino Nicoletti**.
-
