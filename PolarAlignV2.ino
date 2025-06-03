@@ -117,6 +117,40 @@ void moveMotor(int stepPin, int dirPin, float degrees, float stepsPerDegree, flo
   pos += degrees;
 }
 
+// ----------------------------- SETUP -----------------------------
+void setup() {
+  Serial.begin(9600);
+  delay(500);
+
+  pinMode(EN_PIN_AZM, OUTPUT);
+  pinMode(DIR_PIN_AZM, OUTPUT);
+  pinMode(STEP_PIN_AZM, OUTPUT);
+  digitalWrite(EN_PIN_AZM, LOW);
+
+  pinMode(DIR_PIN_ALT, OUTPUT);
+  pinMode(STEP_PIN_ALT, OUTPUT);
+  digitalWrite(EN_PIN_ALT, LOW);
+
+  AZMSerial.begin(115200, SERIAL_8N1, SERIAL_RX_AZM, -1);
+  ALTSerial.begin(115200, SERIAL_8N1, SERIAL_RX_ALT, -1);
+
+  driverAZM.begin();
+  driverAZM.pdn_disable(true);
+  driverAZM.I_scale_analog(false);
+  driverAZM.rms_current(500);
+  driverAZM.microsteps(MICROSTEPPING);
+  driverAZM.en_spreadCycle(false);
+
+  driverALT.begin();
+  driverALT.pdn_disable(true);
+  driverALT.I_scale_analog(false);
+  driverALT.rms_current(500);
+  driverALT.microsteps(MICROSTEPPING);
+  driverALT.en_spreadCycle(false);
+
+  Serial.println("READY");
+}
+
 // ----------------------------- LOOP -----------------------------
 void loop() {
   if (Serial.available()) {
@@ -124,42 +158,68 @@ void loop() {
     input.trim();
 
     if (input.startsWith("AZM:")) {
-      // ... identique
+      float deg = input.substring(4).toFloat();
+      float newPos = currentPosAZM + deg;
+      if (newPos >= LIMIT_MIN_AZM && newPos <= LIMIT_MAX_AZM) {
+        if (deg != 0.0) Serial.println("BUSY");
+        moveMotor(STEP_PIN_AZM, DIR_PIN_AZM, deg, STEPS_PER_DEGREE_AZM, currentPosAZM);
+        Serial.println("OK");
+      } else {
+        Serial.println("ERR:AZM out of bounds");
+      }
     }
+
     else if (input.startsWith("ALT:")) {
-      // ... identique
+      float deg = input.substring(4).toFloat();
+      float newPos = currentPosALT + deg;
+      if (newPos >= LIMIT_MIN_ALT && newPos <= LIMIT_MAX_ALT) {
+        if (deg != 0.0) Serial.println("BUSY");
+        moveMotor(STEP_PIN_ALT, DIR_PIN_ALT, deg, STEPS_PER_DEGREE_ALT, currentPosALT);
+        Serial.println("OK");
+      } else {
+        Serial.println("ERR:ALT out of bounds");
+      }
     }
+
     else if (input == "RST") {
-      // ... identique
+      currentPosAZM = 0.0;
+      currentPosALT = 0.0;
+      Serial.println("OK");
     }
+
     else if (input == "HOME") {
-      // ... identique
+      Serial.println("BUSY");
+      moveMotor(STEP_PIN_AZM, DIR_PIN_AZM, -currentPosAZM, STEPS_PER_DEGREE_AZM, currentPosAZM);
+      moveMotor(STEP_PIN_ALT, DIR_PIN_ALT, -currentPosALT, STEPS_PER_DEGREE_ALT, currentPosALT);
+      Serial.println("OK");
     }
+
     else if (input == "POS?" || input == "STA?") {
-      // ... identique
+      Serial.print("POS:AZM=");
+      Serial.print(currentPosAZM, 3);
+      Serial.print(",ALT=");
+      Serial.println(currentPosALT, 3);
     }
+
     else if (input == "?") {
       Serial.print("<Idle|MPos:");
       Serial.print(currentPosAZM, 3);
       Serial.print(",");
       Serial.print(currentPosALT, 3);
       Serial.println(",0|");
-      Serial.println(); // empty line for TPPA
+      Serial.println();
     }
 
     else if (input.startsWith("J=")) {
       input = input.substring(2);
+      input.replace("G21", "");
 
       bool isRelative = false;
       char axis = 0;
       float value = 0.0;
       int fIndex = input.indexOf('F');
 
-      // Accept either G91G21 or G91 for relative
-      if (input.startsWith("G91G21")) {
-        isRelative = true;
-        input = input.substring(6);
-      } else if (input.startsWith("G91")) {
+      if (input.startsWith("G91")) {
         isRelative = true;
         input = input.substring(3);
       } else if (input.startsWith("G53")) {
@@ -195,6 +255,7 @@ void loop() {
           Serial.println("ERR:AZM out of bounds");
         }
       }
+
       else if (axis == 'Y') {
         float target = isRelative ? currentPosALT + value : value;
         if (target >= LIMIT_MIN_ALT && target <= LIMIT_MAX_ALT) {
