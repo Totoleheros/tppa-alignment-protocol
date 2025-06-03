@@ -92,9 +92,9 @@ You can also view photos of the physical setup in [`IMAGES/ASSEMBLY`](./IMAGES/A
 
 | Command         | Description                                      |
 |----------------|--------------------------------------------------|
-| `AZM:+1.25`     | Move azimuth motor +1.25°                        |
+| `AZM:+5.25`     | Move azimuth motor +5.25°                        |
 | `AZM:-0.50`     | Move azimuth motor -0.50°                        |
-| `ALT:+0.80`     | Move altitude motor +0.80°                       |
+| `ALT:+8.80`     | Move altitude motor +8.80°                       |
 | `ALT:-1.20`     | Move altitude motor -1.20°                       |
 | `RST`           | Reset internal positions of both axes           |
 | `HOME`          | Return both motors to position 0,0              |
@@ -113,12 +113,13 @@ You can also view photos of the physical setup in [`IMAGES/ASSEMBLY`](./IMAGES/A
 
 | Command Example              | Description                                      |
 |-----------------------------|--------------------------------------------------|
-| `J=G53X+1.25F400`            | Move AZM +1.25° at speed 400 (absolute)         |
-| `J=G91X-0.50F300`            | Move AZM -0.50° at speed 300 (relative)         |
-| `J=G91Y+0.20F200`            | Move ALT +0.20° at speed 200 (relative)         |
-| `J=G53Y-0.80F400`            | Move ALT -0.80° at speed 400 (absolute)         |
+| `J=G53X+5.00F400`            | Move AZM +5.00° at speed 400 (absolute)         |
+| `J=G91G21X-6.50F300`            | Move AZM -6.50° at speed 300 (relative)         |
+| `J=G53Y-8.80F400`            | Move ALT -8.80° at speed 400 (absolute)         |
+| `J=G91G21Y+2.20F300`            | Move ALT +2.20° at speed 300 (relative)         |
 
-> ✅ `G53` = absolute mode, `G91` = relative mode  
+
+> ✅ `G53` = absolute mode, `G91G21` = relative mode  
 > ✅ `X` targets AZM, `Y` targets ALT  
 > ✅ `Fxxx` is the speed, required as an integer
 
