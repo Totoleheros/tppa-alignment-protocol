@@ -160,4 +160,4 @@ MIT — do whatever you want, just keep the header.
 * **Stefan Berg** – author of the **Three-Point Polar Alignment** plug-in and core N.I.N.A. contributor; his late-night Discord chats made this micro-firmware feasible.  
 * **Avalon Instruments** – for the idea of a lean, GRBL-style alignment controller.  
 * **OnStep** – ongoing source of inspiration for all things mount control.  
-* Maintained by **Antonino Nicoletti** ([antonino.antispam@free.fr]([(https://github.com/Totoleheros/tppa-compliant-motorized-polar-aligment/)]) – *clear skies!*
+* Maintained by **Antonino Nicoletti** ([antonino.antispam@free.fr]]) – *clear skies!*
