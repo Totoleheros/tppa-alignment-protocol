@@ -1,6 +1,7 @@
 # Serial Alt‑Az Polar Alignment Controller
 
-Minimal **GRBL‑style** firmware + hardware recipe for driving a two‑axis (Azimuth & Altitude) mount during polar‑alignment routines such as **TPPA** in **N.I.N.A.**  
+Minimal **GRBL‑style** firmware + hardware recipe for driving a two‑axis (Azimuth & Altitude) mount during polar‑alignment routines such 
+as **TPPA** in **N.I.N.A.**  
 It runs on the *FYSETC E4 V1.0* (ESP32 + dual TMC2209) and pretends to be a micro‑controller that understands `$J=…` jog commands and `<Idle|MPos:…|` status frames.
 
 > **TL;DR** – Flash the sketch, wire the motors, set N.I.N.A. to talk to a **generic GRBL device**, **leave the TPPA “Gear Ratio” field at `1.0`**, and the routine will move your mount by up to **± 15 °**.
@@ -148,6 +149,7 @@ Pull requests welcome!
 
 ## 📄 License
 
+
 MIT — do whatever you want, just keep the header.
 
 ---
@@ -158,4 +160,4 @@ MIT — do whatever you want, just keep the header.
 * **Stefan Berg** – author of the **Three-Point Polar Alignment** plug-in and core N.I.N.A. contributor; his late-night Discord chats made this micro-firmware feasible.  
 * **Avalon Instruments** – for the idea of a lean, GRBL-style alignment controller.  
 * **OnStep** – ongoing source of inspiration for all things mount control.  
-* Maintained by **Antonino Nicoletti** ([antonino.antispam@free.fr](https://github.com/Totoleheros/tppa-alignment-protocol)) – *clear skies!*
+* Maintained by **Antonino Nicoletti** ([antonino.antispam@free.fr]([(https://github.com/Totoleheros/tppa-compliant-motorized-polar-aligment/)]) – *clear skies!*
