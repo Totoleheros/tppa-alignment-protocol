@@ -30,6 +30,9 @@ First functional prototype: <https://d.pr/v/Lk6GNp>
 ## 🔩 Hardware Overview
 
 See **[`HARDWARE.md`](./HARDWARE.md)** for full assembly photos and wiring diagrams.
+> ⚠️ **IMPORTANT WARNING**  
+> **Please note that I have a major issue with the holding torque on the ALT axis in the current design.**  
+> **I will post a revised design soon. DO NOT FOLLOW the current design!!!**
 
 | Part | Notes |
 |------|-------|
